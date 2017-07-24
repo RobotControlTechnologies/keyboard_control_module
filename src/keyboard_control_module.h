@@ -18,12 +18,18 @@ class KeyboardControlModule : public ControlModule {
   std::map<std::string, system_value> axis_names;
 #ifdef _WIN32
   std::map<WORD, AxisKey *> axis_keys;
+  WORD last_key;
 #else
   std::map<uint32_t, AxisKey *> axis_keys;
   std::string InputDevice;
+  uint16_t last_key;
 #endif
 
   std::map<system_value, AxisData *> axis;
+  
+  bool last_state;
+  variable_value last_axis_value;
+  system_value last_axis_index;
 
  public:
   KeyboardControlModule();

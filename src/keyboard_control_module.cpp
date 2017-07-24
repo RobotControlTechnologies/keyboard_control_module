@@ -88,9 +88,13 @@ void KeyboardControlModule::execute(sendAxisState_t sendAxisState) {
       for (i = 0; i < cNumRead; ++i) {
         if (irInBuf[i].EventType == KEY_EVENT) {
           WORD key_code = irInBuf[i].Event.KeyEvent.wVirtualKeyCode;
-          colorPrintf(ConsoleColor(), "Key event: %d", key_code);
           bool is_key_pressed = (bool)irInBuf[i].Event.KeyEvent.bKeyDown;
-
+          if(last_key!=key_code || last_state != is_key_pressed){
+            colorPrintf(ConsoleColor(), "Key event: %d \n", key_code);
+            last_key = key_code;
+            last_state = is_key_pressed;
+          }
+          
           if (key_code != VK_ESCAPE) {
 #else
     if (fd == -1) {
@@ -117,9 +121,14 @@ void KeyboardControlModule::execute(sendAxisState_t sendAxisState) {
       }
       if (ev.type == EV_KEY && ev.value >= 0 && ev.value <= 2) {
         uint16_t key_code = ev.code;
-        colorPrintf(ConsoleColor(), "Key event: %d", key_code);
 
         bool is_key_pressed = (bool)ev.value;
+        if(last_key!=key_code || last_state != is_key_pressed){
+            colorPrintf(ConsoleColor(), "Key event: %d \n", key_code);
+            last_key = key_code;
+            last_state = is_key_pressed;
+          }
+        
 
         if (key_code != KEY_ESC) {
 #endif
@@ -130,8 +139,12 @@ void KeyboardControlModule::execute(sendAxisState_t sendAxisState) {
               variable_value val =
                   is_key_pressed ? ak->pressed_value : ak->unpressed_value;
 
-              colorPrintf(ConsoleColor(ConsoleColor::yellow),
-                          "axis %d val %f \n", axis_index, val);
+              if(last_axis_index!=axis_index || last_axis_value!=val){
+                colorPrintf(ConsoleColor(ConsoleColor::yellow),
+                            "axis %d val %f \n", axis_index, val);
+                last_axis_index = axis_index;
+                last_axis_value = val;
+              }
               (*sendAxisState)(this, axis_index, val);
             }
           } else {
